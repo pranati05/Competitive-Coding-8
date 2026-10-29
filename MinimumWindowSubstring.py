@@ -5,50 +5,40 @@
 
 # Your code here along with comments explaining your approach
 # Using sliding window Approach. Initialize a HashMap and add frequencies of characters in t
-# Initialize left and right pointers to 0 and iterate over the string s until right == length of s
-# Initialize another HashMap with characters at right pointer and add the frequencies of it
-# Check if character at right pointer is in first HashMap and if the frequcy is the same if it is then increment the counter by 1
-# If the counter is equal to size of first HashMap and left <= right then check if the substring formed is less than the earlier substring
-# If it is append the length and substring to res array
-# Decrement the second HashMap character frequency by 1 as it gone out of current window
-# If the character at left pointer is in first HashMap and the frequency of character at left pointer is less in second HashMap than the frequency in first HasHMap then decrement counter by 1
-# Increment the left pointer by 1
-# Increment the right pointer by 1
+# Initialize left pointer and counter to 0 and iterate over the string s using for loop
+# Check if character in s is in HashMap and decrement its frequency. If the frequency is 0 then increment the counter by 1
+# While the counter is equal to length of HashMap check if the substring formed from left:i+1 is less than the earlier substring using minlength set to float('inf)
+# If it is replace the length and substring to minlength and smallest_sub string
+# Increment the left pointer by 1 and move the window to remove one left character and add one character in the right
+# For removing we increase frequency in HashMap if ch in HashMap and decrease the counter if the frequency of ch > 0
 # Return smallest substring
-
 
 class Solution:
     def minWindow(self, s: str, t: str) -> str:
-        if not s or not t:
+        if len(t) > len(s):
             return ""
-        dict = {}
+        chdict = {}
         for i in range(len(t)):
-            if t[i] in dict:
-                dict[t[i]] += 1
+            if t[i] not in chdict:
+                chdict[t[i]] = 1
             else:
-                dict[t[i]] = 1
-        res = [-1, ""]
-        size = len(dict)
-        windowdict = {}
+                chdict[t[i]] += 1
         left = 0
-        right = 0
-        formed = 0
-        while right < len(s):
-            if s[right] in windowdict:
-                windowdict[s[right]] += 1
-            else:
-                windowdict[s[right]] = 1
-            if s[right] in dict:
-                if dict[s[right]] == windowdict[s[right]]:
-                    formed += 1
-                while left <= right and formed == size:
-                    if res[0] > right - left + 1 or res[0] == -1:
-                        res[0] = right - left + 1
-                        res[1] = s[left:right + 1]
-                    windowdict[s[left]] -= 1
-                    if s[left] in dict and windowdict[s[left]] < dict[s[left]]:
-                        formed -= 1
-                    left += 1
-            right += 1
-
-        return res[1]
+        count = 0
+        minlength = float('inf')
+        smallest_sub = ""
+        for i in range(len(s)):
+            if s[i] in chdict:
+                chdict[s[i]] -= 1
+                if chdict[s[i]] == 0:
+                    count += 1
+            while count == len(chdict):
+                if i - left + 1 < minlength:
+                    smallest_sub = s[left:i+1]
+                    minlength = i - left + 1
+                if s[left] in chdict:
+                    chdict[s[left]] += 1
+                    if chdict[s[left]] > 0:
+                        count -= 1
+                left += 1
+        return smallest_sub
